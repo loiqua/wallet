@@ -1,0 +1,458 @@
+openapi: 3.0.0
+info:
+ title: Wallet API
+ description: A simple API to manage accounts, transactions, and currencies for a financial tracking application similar to Wallet by BudgetBakers.
+ version: 1.0.0
+
+servers:
+ - url: https://wallet-std22001
+   description: Base URL of the API
+
+tags:
+ - name: Account
+   description: Endpoints related to managing accounts
+ - name: Transaction
+   description: Endpoints related to transactions
+ - name: Currency
+   description: Endpoints related to managing currencies
+
+paths:
+ /accounts:
+    get:
+      summary: Retrieve the list of accounts
+      description: Get a list of all existing accounts.
+      tags:
+        - Account
+      operationId: getAccountList
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessAccountList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+
+
+ /accounts/{id}:
+    get:
+      summary: Retrieve an account by ID
+      description: Get an account by its ID.
+      tags:
+        - Account
+      operationId: getAccountById
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessAccount'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    post:
+      summary: Create a new account
+      description: Create a new account with the provided details.
+      tags:
+        - Account
+      operationId: createAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewAccount'
+      responses:
+        '201':
+          $ref: '#/components/responses/SuccessAccount'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    put:
+      summary: Update an account by ID
+      description: Update an existing account with the provided details.
+      tags:
+        - Account
+      operationId: updateAccountById
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccount'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessAccount'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+ /transactions:
+    get:
+      summary: Fetch transactions for a specific account
+      description: Get a list of transactions for the specified account.
+      tags:
+        - Transaction
+      operationId: getTransactions
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessTransactionList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    
+
+ /transactions/{id}:
+    get:
+      summary: Retrieve a transaction by ID
+      description: Get a transaction by its ID.
+      tags:
+        - Transaction
+      operationId: getTransactionById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the transaction to retrieve
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessTransaction'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    put:
+      summary: Update a transaction by ID
+      description: Update an existing transaction with the provided details.
+      tags:
+        - Transaction
+      operationId: updateTransactionById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the transaction to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTransaction'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessTransaction'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    post:
+      summary: Create a new transaction
+      description: Create a new transaction with the provided details.
+      tags:
+        - Transaction
+      operationId: createTransaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTransaction'
+      responses:
+        '201':
+          $ref: '#/components/responses/SuccessTransaction'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+ /currencies:
+    get:
+      summary: Retrieve the list of available currencies
+      description: Get a list of all available currencies.
+      tags:
+        - Currency
+      operationId: getCurrencies
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCurrencyList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    
+
+ /currencies/{id}:
+    get:
+      summary: Retrieve a currency by ID
+      description: Get a currency by its ID.
+      tags:
+        - Currency
+      operationId: getCurrencyById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the currency to retrieve
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCurrency'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    put:
+      summary: Update a currency by ID
+      description: Update an existing currency with the provided details.
+      tags:
+        - Currency
+      operationId: updateCurrencyById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the currency to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewCurrency'
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessCurrency'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    post:
+      summary: Add a new currency
+      description: Add a new currency with the provided details.
+      tags:
+        - Currency
+      operationId: addCurrency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewCurrency'
+      responses:
+        '201':
+          $ref: '#/components/responses/SuccessCurrency'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+components:
+ schemas:
+    Account:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        balance:
+          type: number
+          format: float
+        currency:
+          type: integer
+      description: Represents an account.
+
+    NewAccount:
+      type: object
+      properties:
+        name:
+          type: string
+        currency:
+          type: string
+      required:
+        - name
+        - currency
+      description: Represents the data needed to create a new account.
+
+    UpdateAccount:
+      type: object
+      properties:
+        name:
+          type: string
+        currency:
+          type: integer
+      required:
+        - name
+        - currency
+      description: Represents the data needed to update an existing account.
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        accountId:
+          type: integer
+          format: int64
+        description:
+          type: string
+        amount:
+          type: number
+          format: float
+        currency:
+          type: integer
+        date:
+          type: string
+          format: date-time
+      description: Represents a financial transaction.
+
+    UpdateTransaction:
+      type: object
+      properties:
+        description:
+          type: string
+        amount:
+          type: number
+          format: float
+        currency:
+          type: integer
+      required:
+        - description
+        - amount
+        - currency
+      description: Represents the data needed to update an existing transaction.
+
+    NewTransaction:
+      type: object
+      properties:
+        accountId:
+          type: integer
+          format: int64
+        description:
+          type: string
+        amount:
+          type: number
+          format: float
+        currency:
+          type: integer
+      required:
+        - accountId
+        - description
+        - amount
+        - currency
+      description: Represents the data needed to create a new transaction.
+
+    Currency:
+      type: object
+      properties:
+        currency_id:
+          type: integer
+          format: int64
+        currency_name:
+          type: string
+      description: Represents a currency.
+
+    NewCurrency:
+      type: object
+      properties:
+        currency_name:
+          type: string
+      required:
+        - currency_name
+      description: Represents the data needed to add a new currency.
+
+ parameters:
+    AccountId:
+      name: accountId
+      in: query
+      description: ID of the account to retrieve transactions for
+      required: true
+      schema:
+        type: integer
+        format: int64
+     
+
+    Page:
+      name: page
+      in: query
+      description: Page number for pagination
+      required: false
+      schema:
+        type: integer
+        format: int64
+  
+
+    PageSize:
+      name: page_size
+      in: query
+      description: Number of items per page for pagination
+      required: false
+      schema:
+        type: integer
+        format: int64
+    
+
+ responses:
+    SuccessAccountList:
+      description: Successful response with a list of accounts
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Account'
+    
+
+    SuccessAccount:
+      description: Successful response with an account
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Account'
+    
+
+    SuccessTransactionList:
+      description: Successful response with a list of transactions
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Transaction'
+     
+
+    SuccessTransaction:
+      description: Successful response with a transaction
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Transaction'
+    
+    SuccessCurrencyList:
+      description: Successful response with a list of currencies
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Currency'
+      
+
+    SuccessCurrency:
+      description: Successful response with a currency
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Currency'
+     
+
+    BadRequest:
+      description: Bad request (invalid request body)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
