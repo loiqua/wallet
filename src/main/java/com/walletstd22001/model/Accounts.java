@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.*;
+import java.util.*;
 
 @Getter
 @Setter
@@ -39,5 +40,25 @@ public class Accounts {
         }
 
         return this;
+    }
+
+    public double getBalanceAtDateTime(Date dateTime) {
+        double balance = 0.0;
+
+        // Sorting transactions by date/time
+        Collections.sort(transactionList, Comparator.comparing(Transaction::getDateTime));
+
+        for (Transaction transaction : transactionList) {
+            if (transaction.getDateTime().compareTo(dateTime) <= 0) {
+                if (transaction.getTransactionType().equals("credit")) {
+                    balance += transaction.getAmount();
+                } else {
+                    balance -= transaction.getAmount();
+                }
+            } else {
+                break; // Break the loop when transaction date is after the provided dateTime
+            }
+        }
+        return balance;
     }
 }
