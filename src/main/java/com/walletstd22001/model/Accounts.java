@@ -1,9 +1,7 @@
 package com.walletstd22001.model;
 
 import java.sql.Date;
-import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
+
 import lombok.*;
 import java.util.*;
 
@@ -59,6 +57,19 @@ public class Accounts {
                 break; // Break the loop when transaction date is after the provided dateTime
             }
         }
+        return balance;
+    }
+
+    public double getCurrentBalance() {
+    double balance = 0.0;
+
+    for (Transaction transaction : transactionList) {
+        if (transaction.getTransactionType().equals("credit")) {
+            balance += transaction.getAmount();
+        } else {
+            balance -= transaction.getAmount();
+        }
+    }
         return balance;
     }
 }
