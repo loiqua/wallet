@@ -9,6 +9,7 @@ import lombok.*;
 @ToString
 @EqualsAndHashCode
 public class Currency {
-    private long currencyId; // Utilisation de camelCase pour suivre les conventions Java
-    private String currencyName;
+    private int currencyId;
+    private String name;
+    private String code;
 }

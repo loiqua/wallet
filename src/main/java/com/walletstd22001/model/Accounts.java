@@ -1,37 +1,43 @@
 package com.walletstd22001.model;
 
-import java.math.BigDecimal;
+import java.sql.Date;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
+@Setter
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
 public class Accounts {
-    private long id_account;
-    private String name_account;
-    private BigDecimal current_balance;
-    private long currency_id;
+    private int accountId;
+    private String accountName;
+    private double balance;
+    private Date lastUpdateDate;
+    private List<Transaction> transactionList;
+    private Currency currency;
+    private String accountType;
 
-    public void setId_account(long id_account) {
-        this.id_account = id_account;
-    }
+    public Accounts performTransaction(int transactionId, String label, double amount, String transactionType) {
+        Transaction newTransaction = new Transaction();
+        newTransaction.setTransactionId(transactionId);
+        newTransaction.setLabel(label);
+        newTransaction.setAmount(amount);
+        newTransaction.setDateTime(new Date(transactionId)); // Current date for the transaction
+        newTransaction.setTransactionType(transactionType);
 
-    public void setName_account(String name_account) {
-        this.name_account = name_account;
-    }
-
-    public void setCurrent_balance(BigDecimal current_balance) {
-        if (current_balance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Balance must be greater than or equal to 0");
+        if (accountType.equals("Bank") || (transactionType.equals("credit") && balance >= amount)) {
+            if (transactionType.equals("debit")) {
+                balance -= amount;
+            } else {
+                balance += amount;
+            }
+            transactionList.add(newTransaction);
+            lastUpdateDate = new Date(transactionId); // Update account's date
         }
-        this.current_balance = current_balance;
-    }
 
-    public void setCurrency_id(long currency_id) {
-        this.currency_id = currency_id;
+        return this;
     }
 }

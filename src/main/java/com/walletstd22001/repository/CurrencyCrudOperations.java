@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CurrencyCrudOperations implements CrudOperations<Currency, String> {
+public class CurrencyCrudOperations implements CrudOperations<Currency, Integer> {
     private Connection connection;
 
     public CurrencyCrudOperations(Connection connection) {
@@ -15,10 +15,11 @@ public class CurrencyCrudOperations implements CrudOperations<Currency, String> 
 
     @Override
     public void insert(Currency currency) {
-        String sql = "INSERT INTO currencies(currency_name) VALUES (?)";
+        String sql = "INSERT INTO currencies(name, code) VALUES (?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, currency.getCurrency_name());
+            statement.setString(1, currency.getName());
+            statement.setString(2, currency.getCode());
             statement.executeUpdate();
             System.out.println("Entity inserted successfully");
         } catch (SQLException e) {
@@ -35,8 +36,9 @@ public class CurrencyCrudOperations implements CrudOperations<Currency, String> 
             ResultSet result = statement.executeQuery(sql);
             while (result.next()) {
                 allCurrencies.add(new Currency(
-                        result.getLong("currency_id"),
-                        result.getString("currency_name")));
+                        result.getInt("currencyId"),
+                        result.getString("name"),
+                        result.getString("code")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -45,29 +47,18 @@ public class CurrencyCrudOperations implements CrudOperations<Currency, String> 
     }
 
     @Override
-    public Currency getById(String id) {
-        // La méthode getById avec String n'est pas implémentée, vous pouvez laisser non
-        // implémentée ou lancer une exception non supportée.
-        throw new UnsupportedOperationException("Unimplemented method 'getById' with String");
-    }
+    public Currency getById(Integer id) {
+        String sql = "SELECT * FROM Currency WHERE currencyId = ?";
 
-    @Override
-    public void updateById(String id, Currency entityToUpdate) {
-        // La méthode updateById avec String n'est pas implémentée, vous pouvez laisser
-        // non implémentée ou lancer une exception non supportée.
-        throw new UnsupportedOperationException("Unimplemented method 'updateById' with String");
-    }
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet result = statement.executeQuery();
 
-    @Override
-    public Currency getById(int id) {
-        String sql = "SELECT * FROM currencies WHERE currency_id = " + id;
-
-        try (Statement statement = connection.createStatement()) {
-            ResultSet result = statement.executeQuery(sql);
             if (result.next()) {
                 return new Currency(
-                        result.getLong("currency_id"),
-                        result.getString("currency_name"));
+                        result.getInt("currency_id"),
+                        result.getString("name"),
+                        result.getString("code"));
             }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -76,16 +67,18 @@ public class CurrencyCrudOperations implements CrudOperations<Currency, String> 
     }
 
     @Override
-    public Currency updateById(int id, String currency_name) {
-        String sql = "UPDATE currencies SET currency_name = ? WHERE currency_id = ?";
+    public Currency updateById(Integer id, Currency entityToUpdate) {
+        String sql = "UPDATE Currency SET name = ?, code = ? WHERE currencyId = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, currency_name);
-            statement.setLong(2, id);
+            statement.setString(1, entityToUpdate.getName());
+            statement.setString(2, entityToUpdate.getCode());
+            statement.setInt(3, id);
             statement.executeUpdate();
+           return getById(id);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return getById(id);
+        return null;
     }
 }

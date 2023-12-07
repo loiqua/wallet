@@ -16,21 +16,23 @@ public class TransactionCrudOperations implements CrudOperations<Transaction, In
     @Override
     public void insert(Transaction transaction) {
         String sql = "INSERT INTO transactions(" +
-                "transaction_date, " +
+                "transactionId, " +
+                "label, " +
                 "amount, " +
-                "description, " +
-                "account_id) VALUES (?, ?, ?, ?)";
+                "dateTime, " +
+                "transactionType) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setDate(1, Date.valueOf(transaction.getTransaction_date()));
-            statement.setBigDecimal(2, transaction.getAmount());
-            statement.setString(3, transaction.getDescription());
-            statement.setLong(4, transaction.getAccount_id());
+            statement.setInt(1, transaction.getTransactionId());
+            statement.setString(2, transaction.getLabel());
+            statement.setDouble(3, transaction.getAmount());
+            statement.setDate(4, new java.sql.Date(transaction.getDateTime().getTime()));
+            statement.setString(5, transaction.getTransactionType());
             statement.executeUpdate();
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    transaction.setTransaction_id(generatedKeys.getLong(1));
+                    transaction.setTransactionId(generatedKeys.getInt(1));
                 } else {
                     throw new SQLException("Insertion failed, no ID obtained.");
                 }
@@ -51,11 +53,11 @@ public class TransactionCrudOperations implements CrudOperations<Transaction, In
             ResultSet result = statement.executeQuery(sql);
             while (result.next()) {
                 allTransactions.add(new Transaction(
-                        result.getLong("transaction_id"),
-                        result.getDate("transaction_date").toLocalDate(),
-                        result.getBigDecimal("amount"),
-                        result.getString("description"),
-                        result.getLong("account_id")));
+                        result.getInt("transactionId"),
+                        result.getString("label"),
+                        result.getDouble("amount"),
+                        result.getDate("dateTime"),
+                        result.getString("transactionType")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -65,17 +67,17 @@ public class TransactionCrudOperations implements CrudOperations<Transaction, In
 
     @Override
     public Transaction getById(Integer id) {
-        String sql = "SELECT * FROM transactions WHERE transaction_id = " + id;
+        String sql = "SELECT * FROM transactions WHERE transactionId = " + id;
 
         try (Statement statement = connection.createStatement()) {
             ResultSet result = statement.executeQuery(sql);
             if (result.next()) {
                 return new Transaction(
-                        result.getLong("transaction_id"),
-                        result.getDate("transaction_date").toLocalDate(),
-                        result.getBigDecimal("amount"),
-                        result.getString("description"),
-                        result.getLong("account_id"));
+                        result.getInt("transactionId"),
+                        result.getString("label"),
+                        result.getDouble("amount"),
+                        result.getDate("dateTime"),
+                        result.getString("transactionType"));
             }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -86,18 +88,18 @@ public class TransactionCrudOperations implements CrudOperations<Transaction, In
     @Override
     public Transaction updateById(Integer id, Transaction updatedTransaction) {
         String sql = "UPDATE transactions SET " +
-                "transaction_date = ?, " +
+                "label = ?, " +
                 "amount = ?, " +
-                "description = ?, " +
-                "account_id = ? " +
-                "WHERE transaction_id = ?";
+                "dateTime = ?, " +
+                "transactionType = ? " +
+                "WHERE transactionId = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setDate(1, Date.valueOf(updatedTransaction.getTransaction_date()));
-            statement.setBigDecimal(2, updatedTransaction.getAmount());
-            statement.setString(3, updatedTransaction.getDescription());
-            statement.setLong(4, updatedTransaction.getAccount_id());
-            statement.setLong(5, id);
+            statement.setString(1, updatedTransaction.getLabel());
+            statement.setDouble(2, updatedTransaction.getAmount());
+            statement.setDate(3, new java.sql.Date(updatedTransaction.getDateTime().getTime()));
+            statement.setString(4, updatedTransaction.getTransactionType());
+            statement.setInt(5, id);
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
