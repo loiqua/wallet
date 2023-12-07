@@ -19,6 +19,13 @@ public class Accounts {
     private Currency currency;
     private String accountType;
 
+    public void addTransaction(Transaction transaction) {
+        if (transactionList == null) {
+            transactionList = new ArrayList<>();
+        }
+        transactionList.add(transaction);
+    }
+
     public Accounts performTransaction(int transactionId, String label, double amount, String transactionType) {
         Transaction newTransaction = new Transaction();
         newTransaction.setTransactionId(transactionId);
@@ -71,5 +78,29 @@ public class Accounts {
         }
     }
         return balance;
+    }
+
+    public List<Double> getBalanceHistory(Date startDate, Date endDate) {
+        List<Double> balanceHistory = new ArrayList<>();
+
+        // Sorting transactions by date/time
+        Collections.sort(transactionList, Comparator.comparing(Transaction::getDateTime));
+
+        double currentBalance = 0.0;
+
+        // Iterate through transactions within the specified interval
+        for (Transaction transaction : transactionList) {
+            java.util.Date transactionDateTime = transaction.getDateTime();
+            if (transactionDateTime.compareTo(startDate) >= 0 && transactionDateTime.compareTo(endDate) <= 0) {
+                if (transaction.getTransactionType().equals("credit")) {
+                    currentBalance += transaction.getAmount();
+                } else {
+                    currentBalance -= transaction.getAmount();
+                }
+                balanceHistory.add(currentBalance);
+            }
+        }
+
+        return balanceHistory;
     }
 }

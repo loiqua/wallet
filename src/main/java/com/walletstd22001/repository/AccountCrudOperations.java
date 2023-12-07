@@ -50,54 +50,54 @@ public class AccountCrudOperations implements CrudOperations<Accounts, Integer> 
     }
 
     @Override
-    public List<Accounts> getAll() {
-        List<Accounts> allAccounts = new ArrayList<>();
-        String sql = "SELECT * FROM accounts";
+public List<Accounts> getAll() {
+    List<Accounts> allAccounts = new ArrayList<>();
+    String sql = "SELECT * FROM accounts";
 
-        try (Statement statement = connection.createStatement()) {
-            ResultSet result = statement.executeQuery(sql);
-            while (result.next()) {
-                Accounts account = new Accounts(0, sql, 0, null, null, null, sql);
-                account.setAccountId(result.getInt("accountId"));
-                account.setAccountName(result.getString("accountName"));
-                account.setBalance(result.getDouble("balance"));
-                account.setLastUpdateDate(result.getDate("lastUpdateDate"));
-                // Ajoutez la logique pour récupérer les autres champs tels que transactionList, currency, accountType
-                allAccounts.add(account);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    try (Statement statement = connection.createStatement()) {
+        ResultSet result = statement.executeQuery(sql);
+        while (result.next()) {
+            Accounts account = new Accounts(0, sql, 0, null, null, null, sql);
+            account.setAccountId(result.getInt("accountId"));
+            account.setAccountName(result.getString("accountName"));
+            account.setBalance(result.getDouble("balance"));
+            account.setLastUpdateDate(result.getDate("lastUpdateDate"));
+            // Récupérez les autres champs tels que transactionList, currency, accountType
+            allAccounts.add(account);
         }
-        return allAccounts;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return allAccounts;
+}
 
-    @Override
-    public Accounts getById(Integer id) {
-        String sql = "SELECT * FROM accounts WHERE accountId = ?";
+@Override
+public Accounts getById(Integer id) {
+    String sql = "SELECT * FROM accounts WHERE accountId = ?";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, id);
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        statement.setInt(1, id);
 
-            ResultSet result = statement.executeQuery();
-            if (result.next()) {
-                Accounts account = new Accounts(id, sql, id, null, null, null, sql);
-                account.setAccountId(result.getInt("accountId"));
-                account.setAccountName(result.getString("accountName"));
-                account.setBalance(result.getDouble("balance"));
-                account.setLastUpdateDate(result.getDate("lastUpdateDate"));
-                // Ajoutez la logique pour récupérer les autres champs tels que transactionList, currency, accountType
-                return account;
-            }
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+        ResultSet result = statement.executeQuery();
+        if (result.next()) {
+            Accounts account = new Accounts(id, sql, id, null, null, null, sql);
+            account.setAccountId(result.getInt("accountId"));
+            account.setAccountName(result.getString("accountName"));
+            account.setBalance(result.getDouble("balance"));
+            account.setLastUpdateDate(result.getDate("lastUpdateDate"));
+            // Récupérez les autres champs tels que transactionList, currency, accountType
+            return account;
         }
-        return null;
+    } catch (SQLException ex) {
+        throw new RuntimeException(ex);
     }
+    return null;
+}
 
     @Override
     public Accounts updateById(Integer id, Accounts updatedAccount) {
         String sql = "UPDATE accounts SET accountName = ?, balance = ?, lastUpdateDate = ?, currency_id = ? WHERE accountId = ?";
-    
+
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, updatedAccount.getAccountName());
             statement.setDouble(2, updatedAccount.getBalance());
@@ -105,7 +105,7 @@ public class AccountCrudOperations implements CrudOperations<Accounts, Integer> 
             statement.setInt(4, updatedAccount.getCurrency().getCurrencyId());
             statement.setInt(5, id);
             statement.executeUpdate();
-    
+
             System.out.println("Entity updated successfully");
             
             // Retourner l'objet Accounts mis à jour
