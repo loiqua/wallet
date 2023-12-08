@@ -1,7 +1,10 @@
-CREATE TABLE IF NOT EXISTS currencies (currency_id SERIAL PRIMARY KEY,
-                                                                  currency_name VARCHAR(255) NOT NULL);
+CREATE TABLE IF NOT EXISTS currencies (id_currency SERIAL PRIMARY KEY,
+                                                                  currency_name VARCHAR(50) NOT NULL,
+                                                                                            currency_code VARCHAR(25) NOT NULL);
 
 
-INSERT INTO currencies (currency_name)
-VALUES ('Euro'), ('Ariary');
+INSERT INTO currencies (currency_name, currency_code)
+VALUES ('Euro',
+        'EUR'), ('Ariary',
+                 'MGA');
 

@@ -1,10 +1,14 @@
 package com.walletstd22001.repository;
 
-import com.walletstd22001.model.Currency;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.walletstd22001.model.Currency;
 
 public class CurrencyCrudOperations implements CrudOperations<Currency, Integer> {
     private Connection connection;
@@ -75,7 +79,7 @@ public class CurrencyCrudOperations implements CrudOperations<Currency, Integer>
             statement.setString(2, entityToUpdate.getCode());
             statement.setInt(3, id);
             statement.executeUpdate();
-           return getById(id);
+            return getById(id);
         } catch (SQLException e) {
             e.printStackTrace();
         }
