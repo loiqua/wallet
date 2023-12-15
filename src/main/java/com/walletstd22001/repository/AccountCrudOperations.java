@@ -1,9 +1,6 @@
 package com.walletstd22001.repository;
 
 import com.walletstd22001.model.Accounts;
-import com.walletstd22001.model.Transaction;
-import com.walletstd22001.model.Currency;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
